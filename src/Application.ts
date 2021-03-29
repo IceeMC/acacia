@@ -3,6 +3,7 @@ import {IApplicationOptions, Keys, PendingReference, ReferredObject, ReferredObj
 import {Util} from "./Util";
 import {randomBytes} from "crypto";
 import {EventEmitter} from "events";
+import {App} from "./decorators";
 
 const isClass = (t: any): boolean => t.constructor?.toString().substring(0, 5) === "class";
 
@@ -22,9 +23,6 @@ export class Application extends EventEmitter {
 
     private static _instance: Application;
 
-    /**
-     * An instance of an Application.
-     */
     static get instance(): Application {
         return Application._instance;
     }
@@ -32,7 +30,7 @@ export class Application extends EventEmitter {
     on(event: "beforeInit", listener: (ref: ReferredObject) => void): this;
     on(event: "afterInit", listener: (ref: ReferredObject) => void): this;
     on(event: "initError", listener: (ref: ReferredObject, err: Error) => void): this;
-    on(event: string, listener: (...args: any[]) => void) {
+    on(event: string, listener: (...args: any[]) => void): this {
         return super.on(event, listener);
     }
 
@@ -95,7 +93,7 @@ export class Application extends EventEmitter {
                 get() {
                     return f;
                 },
-                set(_) {
+                set() {
                     throw new SyntaxError("References cannot mutate state");
                 }
             });
