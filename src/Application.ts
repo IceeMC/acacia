@@ -121,8 +121,7 @@ export class Application extends EventEmitter {
         const pending: ReferredObject[] = [];
         for (const path of files) {
             const c = require(path);
-            if (!c.default) throw new Error(`'${path}' must have a default export!`);
-            if (!Reflect.getMetadata(Keys.RefMetaData, c.default)) throw new Error(`'${path}' is not decorated properly!`);
+            if (!c.default || !Reflect.getMetadata(Keys.RefMetaData, c.default)) continue;
             pending.push({
                 ...Reflect.getMetadata(Keys.RefMetaData, c.default),
                 ref: c.default,
