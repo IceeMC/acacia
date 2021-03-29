@@ -16,6 +16,11 @@ export class Application extends EventEmitter {
 
     constructor(private options: IApplicationOptions) {
         super();
+        if (options.singletons?.length > 0) {
+            for (const s of options.singletons) {
+                this.registerSingleton(s);
+            }
+        }
         if (Application._instance)
             throw new SyntaxError("An application is already registered!");
         Application._instance = this;

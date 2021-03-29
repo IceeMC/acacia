@@ -1,6 +1,7 @@
 export interface IApplicationOptions {
     serviceDir: string;
     componentDir: string;
+    singletons?: any[];
 }
 
 export interface ReferredObjectMetadata {
