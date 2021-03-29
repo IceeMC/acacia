@@ -25,7 +25,7 @@ export class Application extends EventEmitter {
     /**
      * An instance of an Application.
      */
-    static get instance() {
+    static get instance(): Application {
         return Application._instance;
     }
 
@@ -39,7 +39,7 @@ export class Application extends EventEmitter {
     /*
      * Loads all components/services, then injects any pending references.
      */
-    public async load() {
+    public async load(): Promise<void> {
         this.initialiseDirectory(this.options.componentDir);
         this.initialiseDirectory(this.options.serviceDir);
         await this.injectRefs();
@@ -49,7 +49,7 @@ export class Application extends EventEmitter {
      * Registers a singleton.
      * @param s The singleton to register
      */
-    public registerSingleton(s: any) {
+    public registerSingleton(s: any): void {
         if (this.singletons.includes(s))
             throw new Error(`Attempt to register duplicate singleton ${s}`);
         const data: ReferredObject = {
@@ -87,7 +87,7 @@ export class Application extends EventEmitter {
      * Injects all references.
      * @private
      */
-    private async injectRefs() {
+    private async injectRefs(): Promise<void> {
         let ref: PendingReference;
         while ((ref = this.refs.shift())) {
             const f = this.findReference(isClass(ref.typeMeta) ? ref.typeMeta.constructor : ref.typeMeta);
@@ -104,7 +104,7 @@ export class Application extends EventEmitter {
         for (const s of this.services) await this.tryInit(s);
     }
 
-    private async tryInit(ref: ReferredObject) {
+    private async tryInit(ref: ReferredObject): Promise<void> {
         if (!ref.ref.init) return;
         try {
             this.emit("beforeInit", ref);
@@ -120,7 +120,7 @@ export class Application extends EventEmitter {
      * @param dir The directory in which to search for files.
      * @private
      */
-    private initialiseDirectory(dir: string) {
+    private initialiseDirectory(dir: string): void {
         const files = Util.getFilesRecursively(dir, f => f.search(/\.(js|ts)$/) > -1, []);
         const pending: ReferredObject[] = [];
         for (const path of files) {
@@ -149,7 +149,7 @@ export class Application extends EventEmitter {
      * Shutdown all components/services (i.e for read/write operations)
      * @private
      */
-    private async shutdown() {
+    private async shutdown(): Promise<void> {
         for (const c of this.components) await c.ref.shutdown?.();
         for (const s of this.services) await s.ref.shutdown?.();
     }
