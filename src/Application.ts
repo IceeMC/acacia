@@ -12,7 +12,6 @@ export class Application extends EventEmitter {
     singletons: ReferredObject[] = [];
     services: ReferredObject[] = [];
     components: ReferredObject[] = [];
-    refs: PendingReference[] = [];
 
     constructor(private options: IApplicationOptions) {
         super();
@@ -92,8 +91,8 @@ export class Application extends EventEmitter {
      * @private
      */
     private async injectRefs(): Promise<void> {
-        let ref: PendingReference;
-        while ((ref = this.refs.shift())) {
+        const refs = Reflect.getMetadata(Keys.Refs, global);
+        for (const ref of refs) {
             const f = this.findReference(isClass(ref.typeMeta) ? ref.typeMeta.constructor : ref.typeMeta);
             Object.defineProperty(ref.target, ref.key, {
                 get() {

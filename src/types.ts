@@ -22,11 +22,11 @@ export interface RefBase {
 
 export interface PendingReference {
     target: Object;
-    typeMeta: any;
     key: string | symbol;
-    targetMeta: ReferredObjectMetadata;
+    typeMeta: any;
 }
 
 export enum Keys {
-    RefMetaData = "referenced_metadata"
+    RefMetaData = "referenced_metadata",
+    Refs = "refs"
 }
