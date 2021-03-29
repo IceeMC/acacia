@@ -3,7 +3,6 @@ import {IApplicationOptions, Keys, PendingReference, ReferredObject, ReferredObj
 import {Util} from "./Util";
 import {randomBytes} from "crypto";
 import {EventEmitter} from "events";
-import {App} from "./decorators";
 
 const isClass = (t: any): boolean => t.constructor?.toString().substring(0, 5) === "class";
 
@@ -103,10 +102,9 @@ export class Application extends EventEmitter {
     }
 
     private async tryInit(ref: ReferredObject): Promise<void> {
-        if (!ref.ref.init) return;
         try {
             this.emit("beforeInit", ref);
-            await ref.ref.init();
+            await ref.ref.init?.();
             this.emit("afterInit", ref);
         } catch (e) {
             this.emit("initError", ref, e);
