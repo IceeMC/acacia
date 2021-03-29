@@ -3,6 +3,7 @@ import {IApplicationOptions, Keys, PendingReference, ReferredObject, ReferredObj
 import {Util} from "./Util";
 import {randomBytes} from "crypto";
 import {EventEmitter} from "events";
+import {sep} from "path";
 
 const isClass = (t: any): boolean => t.constructor?.toString().substring(0, 5) === "class";
 
@@ -26,6 +27,7 @@ export class Application extends EventEmitter {
         return Application._instance;
     }
 
+    on(event: "warn", listener: (msg: string) => void): this;
     on(event: "beforeInit", listener: (ref: ReferredObject) => void): this;
     on(event: "afterInit", listener: (ref: ReferredObject) => void): this;
     on(event: "initError", listener: (ref: ReferredObject, err: Error) => void): this;
@@ -121,7 +123,8 @@ export class Application extends EventEmitter {
         const pending: ReferredObject[] = [];
         for (const path of files) {
             const c = require(path);
-            if (!c.default || !Reflect.getMetadata(Keys.RefMetaData, c.default)) continue;
+            if (!c.default || !Reflect.getMetadata(Keys.RefMetaData, c.default))
+                this.emit("warn", `${path.split(sep)[path.split(sep).length - 1]} is not decorated properly, or does not have a default export!`);
             pending.push({
                 ...Reflect.getMetadata(Keys.RefMetaData, c.default),
                 ref: c.default,
