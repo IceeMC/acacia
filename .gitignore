@@ -1,6 +1,8 @@
 config.json
 test/
 dist/
+.idea/
+*.lock
 
 # Logs
 logs
