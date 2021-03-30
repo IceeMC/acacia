@@ -1,6 +1,6 @@
 {
   "name": "@winterfoxxo/acacia",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Simple application framework, for personal use",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

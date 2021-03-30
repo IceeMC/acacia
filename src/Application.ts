@@ -79,7 +79,7 @@ export class Application extends EventEmitter {
      */
     public findReference(cls: any) {
         const meta: ReferredObjectMetadata = Reflect.getMetadata(Keys.RefMetaData, cls);
-        if (!meta) throw new ReferenceError(`Reference to ${cls.constructor ? cls.constructor.name : cls.toString()} is not one of Service, Component, Singleton`);
+        if (!meta) throw new ReferenceError(`Reference to ${cls.name ?? "unknown"} is not one of Service, Component, Singleton`);
         const allMeta = this.getAllReferredObjects();
         const found = allMeta.find(x => x.name === meta.name && x.type === meta.type);
         if (!found) throw new ReferenceError(`Unknown reference to ${meta.type} with name: ${meta.name}`);
