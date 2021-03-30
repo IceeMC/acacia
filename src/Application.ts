@@ -87,24 +87,41 @@ export class Application extends EventEmitter {
     }
 
     /**
-     * Injects all references.
-     * @private
+     * Injects all NON recursive references.
      */
     private async injectRefs(): Promise<void> {
-        const refs = Reflect.getMetadata(Keys.Refs, global);
-        for (const ref of refs) {
-            const f = this.findReference(isClass(ref.typeMeta) ? ref.typeMeta.constructor : ref.typeMeta);
-            Object.defineProperty(ref.target, ref.key, {
-                get() {
-                    return f;
-                },
-                set() {
-                    throw new SyntaxError("References cannot mutate state");
-                }
-            });
-        }
+        const refs: PendingReference[] = Reflect.getMetadata(Keys.Refs, global);
+        for (const ref of refs) this._inject(ref);
         for (const c of this.components) await this.tryInit(c);
         for (const s of this.services) await this.tryInit(s);
+    }
+
+    /**
+     * Injects any underlying references into a class.
+     * An example where this can be useful is a service which loads classes, and the required files have @Ref annotations.
+     * @param cls
+     */
+    public injectRefsInto(cls: any) {
+        const pendingReferences: PendingReference[] = (<PendingReference[]> Reflect.getMetadata(Keys.Refs, global))
+            .filter(x => isClass(x.target) ? x.target.constructor === cls.constructor : x.target === cls);
+        for (const ref of pendingReferences) this._inject(ref);
+    }
+
+    /**
+     * Injects a reference into a class.
+     * @param ref
+     * @private
+     */
+    private _inject(ref) {
+        const f = this.findReference(isClass(ref.typeMeta) ? ref.typeMeta.constructor : ref.typeMeta);
+        Object.defineProperty(ref.target, ref.key, {
+            get() {
+                return f;
+            },
+            set() {
+                throw new SyntaxError("Injected references cannot mutate state");
+            }
+        });
     }
 
     private async tryInit(ref: ReferredObject): Promise<void> {
